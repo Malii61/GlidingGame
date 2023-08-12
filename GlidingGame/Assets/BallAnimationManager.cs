@@ -9,14 +9,12 @@ public class BallAnimationManager : MonoBehaviour
         OpenWings,
         CloseWings,
     }
-    [SerializeField] private float speedChangerValue = .8f; 
+    [SerializeField] private float speedChangerValue = .8f;
     private const string ROTATE_BALL = "RotateBall";
     private const string OPEN_WINGS = "Armature|1_Open_wings_2";
     private const string CLOSE_WINGS = "Armature|2_Close_wings";
 
     private Animator animator;
-    private bool isWingsClosed = false;
-    private bool isClosing;
 
     private void Start()
     {
@@ -33,12 +31,6 @@ public class BallAnimationManager : MonoBehaviour
                 if (animator.speed <= 0)
                 {
                     animator.speed = 1;
-                    if (isClosing)
-                    {
-                        isClosing = false;
-                        Debug.Log("KAPATILDI DÖNÜLDÜ");
-                        return;
-                    }
                     animator.Play(OPEN_WINGS);
                 }
                 else
@@ -47,18 +39,14 @@ public class BallAnimationManager : MonoBehaviour
                 }
                 break;
             case AnimationState.CloseWings:
-                isClosing = true;
-                Debug.Log("close wings oynat");
                 animator.Play(CLOSE_WINGS);
                 break;
         }
     }
+
     public void OnClosedWings()
     {
-        Debug.Log("on closed wings");
-        animator.speed = 0f;
-        ChangeAnimatorSpeed(isFaster: true);
-        isClosing = false;
+        Play(AnimationState.RotateBall);
     }
     public void ChangeAnimatorSpeed(bool isFaster)
     {
@@ -77,13 +65,10 @@ public class BallAnimationManager : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
             animator.speed += value;
 
-            if ((value < 0 && animator.speed > 0f) || (value > 0 && animator.speed < 1f))
+            if (value < 0 && animator.speed > 0f)
                 continue;
 
-
-            AnimationState state = animator.speed >= 1 ? AnimationState.RotateBall : AnimationState.OpenWings;
-            animator.speed = animator.speed > 1 ? 1 : (animator.speed < 0 ? 0 : animator.speed);
-            Play(state);
+            Play(AnimationState.OpenWings);
             break;
         }
 

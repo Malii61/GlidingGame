@@ -5,13 +5,26 @@ using UnityEngine;
 public class ObstacleSpawner : MonoBehaviour
 {
     [SerializeField] private float xLimit = 200f;
-    [SerializeField] private float zLimit = 1000f;
+    [SerializeField] private float zLimit = 1500f;
     [SerializeField] private Transform cylinderPrefab;
     [SerializeField] private Transform cubePrefab;
-    public float checkRadius = 10f; // Kontrol edilecek menzil yarıçapı
+    public float checkRadius = 20f; // Kontrol edilecek menzil yarıçapı
     private void Start()
     {
-        SpawnObstacle(1000, cylinderPrefab);
+        SpawnObstacle(100, cylinderPrefab);
+        SpawnObstacle(500, cubePrefab);
+        SpawnObstacle(100, cylinderPrefab);
+        SpawnObstacle(500, cubePrefab);
+        SpawnObstacle(100, cylinderPrefab);
+        SpawnObstacle(500, cubePrefab);
+        SpawnObstacle(100, cylinderPrefab);
+        SpawnObstacle(500, cubePrefab);
+        SpawnObstacle(100, cylinderPrefab);
+        SpawnObstacle(500, cubePrefab);
+        SpawnObstacle(100, cylinderPrefab);
+        SpawnObstacle(500, cubePrefab);
+        SpawnObstacle(100, cylinderPrefab);
+        SpawnObstacle(500, cubePrefab);
     }
     private void SpawnObstacle(int obstacleCount, Transform prefab)
     {

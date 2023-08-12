@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private float bouncyAmount;
 
-    // Update is called once per frame
-    void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-        
+        if (collision.transform.TryGetComponent(out Rigidbody rb))
+        {
+            // Çarpýþmanýn gerçekleþtiði noktayý ve çarpýþmanýn yüzey normalini al
+            ContactPoint contactPoint = collision.contacts[0];
+            Vector3 contactNormal = contactPoint.normal;
+
+            // Hareket yönünü tersine çevirerek nesneye kuvvet uygula
+            float forceMagnitude = rb.velocity.magnitude; // Kuvvet büyüklüðü, nesnenin hýzýna baðlý olarak
+            Vector3 oppositeForce = -contactNormal * forceMagnitude * bouncyAmount;
+
+            rb.AddForce(oppositeForce, ForceMode.Impulse);
+
+            // Kuþa ileri yönde sürekli bir kuvvet uygula
+            Vector3 forwardForce = transform.forward * forceMagnitude;
+            rb.AddForce(forwardForce, ForceMode.Force);
+        }
     }
 }

@@ -29,12 +29,15 @@ public class CameraFollowerPoint : MonoBehaviour
                 break;
         }
     }
-
-    // Update is called once per frame
-    void LateUpdate()
+    private void LateUpdate()
     {
         transform.rotation = firstRotation;
 
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
         if (isPositionLocked)
         {
             transform.position = lockedPosition;
