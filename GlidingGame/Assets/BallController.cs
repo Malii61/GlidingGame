@@ -76,6 +76,7 @@ public class BallController : MonoBehaviour
                 {
                     ballAnimationManager.Play(BallAnimationManager.AnimationState.OpenWings);
                     shape = Shape.Winged;
+                    rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
                 }
             }
             else if (touch.phase == TouchPhase.Moved)
