@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BallController : MonoBehaviour
 {
@@ -30,23 +29,23 @@ public class BallController : MonoBehaviour
     private float globalGravity = -9.81f;
 
     private bool isFirstTouch = true;
-    [SerializeField] private float rotationSensitivity = 3f;
+    [SerializeField] private float rotationSensitivity = 2f;
     public float maxRotation = 50.0f;
-    public float rotationSpeed = 1.0f;
     public float moveSpeed = 5.0f;
     public float rotationSpeedDivider = 10.0f; // Ekran genişliğine bölün
     private Vector2 touchStartPos;
-    private float initialRotationZ;
-    [SerializeField] private float smoothness = 5f;
+    private float zRotation;
+    [SerializeField] private float velocitySensitivity = 2f;
 
-    [SerializeField] private float wingedZSpeed;
-    private float previousRotationAmount;
-    private float adjustedRotationAmount;
-
+    private float previousTouchDelta;
+    private bool isFirstMove;
+    private Vector3 firstPos;
+    [SerializeField] private float rotateYMultiplier;
     private void Awake()
     {
         Instance = this;
         rb = GetComponent<Rigidbody>();
+        firstPos = transform.position;
     }
     void Start()
     {
@@ -60,6 +59,11 @@ public class BallController : MonoBehaviour
                 isStickTracked = true;
                 rb.isKinematic = true;
                 isFirstTouch = true;
+                rb.velocity = Vector3.zero;
+                transform.position = firstPos;
+                transform.rotation = Quaternion.identity;
+                zRotation = 0f;
+                shape = Shape.Ball;
                 break;
 
             case GameManager.State.Playing:
@@ -80,81 +84,130 @@ public class BallController : MonoBehaviour
     private void Update()
     {
         if (GameManager.Instance.GetState() != GameManager.State.Playing) { return; }
+#if !UNITY_EDITOR
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (EventSystem.current.currentSelectedGameObject != null) { return; }
+
+            if (shape == Shape.Ball)
+            {
+                ballAnimationManager.Play(BallAnimationManager.AnimationState.OpenWings);
+                shape = Shape.Winged;
+                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+                touchStartPos = Input.mousePosition;
+                previousTouchDelta = touchStartPos.x;
+                isFirstMove = true;
+            }
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            RotateBird(Input.mousePosition.x);
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            if (shape == Shape.Winged)
+            {
+                ballAnimationManager.Play(BallAnimationManager.AnimationState.CloseWings);
+                shape = Shape.Ball;
+            }
+        }
+#else
         if (Input.touchCount > 0)
         {
+            if (EventSystem.current.currentSelectedGameObject != null) { return; }
+
             Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
             {
-                if (shape == Shape.Ball && !isFirstTouch)
+                if (shape == Shape.Ball)
                 {
                     ballAnimationManager.Play(BallAnimationManager.AnimationState.OpenWings);
                     shape = Shape.Winged;
-                    float adjustedWingedZSpeed = (rb.velocity.z < wingedZSpeed && rb.velocity.z > wingedZSpeed / 2f) ? rb.velocity.z : wingedZSpeed;
-                    rb.velocity = new Vector3(rb.velocity.x, 0, adjustedWingedZSpeed);
+                    rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
                     touchStartPos = touch.position;
-                    initialRotationZ = 0;
+                    previousTouchDelta = touchStartPos.x;
+                    isFirstMove = true;
                 }
             }
-            else if (touch.phase == TouchPhase.Moved)
+            else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
             {
-                float touchDelta = touch.position.x - touchStartPos.x;
-                float rotationAmount = touchDelta / Screen.width * rotationSpeedDivider;
-                adjustedRotationAmount = rotationAmount - previousRotationAmount;
-                previousRotationAmount = rotationAmount;
-                float clampedRotationAmount = Mathf.Clamp(rotationAmount, -maxRotation, maxRotation);
-                initialRotationZ += clampedRotationAmount;
-                transform.rotation = Quaternion.Euler(0, 0, -initialRotationZ);
-
-                touchStartPos = touch.position;
-                // Adjust velocity based on rotation
-                float targetVelocityX = Mathf.Sin(clampedRotationAmount * Mathf.Deg2Rad) * moveSpeed;
-                Vector3 targetVelocity = new Vector3(targetVelocityX, rb.velocity.y, rb.velocity.z);
-                rb.velocity = Vector3.Lerp(rb.velocity, targetVelocity, Time.deltaTime * smoothness);
-
+                RotateBird(touch.position.x);
             }
             else if (touch.phase == TouchPhase.Ended)
             {
-                if (isFirstTouch)
+                if (shape == Shape.Winged)
                 {
-                    isFirstTouch = false;
-                    return;
+                    ballAnimationManager.Play(BallAnimationManager.AnimationState.CloseWings);
+                    shape = Shape.Ball;
                 }
-                ballAnimationManager.Play(BallAnimationManager.AnimationState.CloseWings);
-                shape = Shape.Ball;
-                transform.rotation = Quaternion.identity;
-                //rb.velocity = currentSpeed;
             }
         }
+#endif
+        MoveBird();
     }
-    private void RotateAndMoveBird()
+    private void RotateBird(float currentTouchPosX)
     {
-        Quaternion rotation = transform.rotation;
-        float angleZ = rotation.eulerAngles.z;
+        float touchDelta = currentTouchPosX - touchStartPos.x;
+        float rotationAmount = (touchDelta - previousTouchDelta) / Screen.width * rotationSpeedDivider;
+        previousTouchDelta = touchDelta;
 
-        float targetVelocityX = -Mathf.Sign(Mathf.Sin(angleZ * Mathf.Deg2Rad)) * moveSpeed;
+        if (isFirstMove)
+        {
+            isFirstMove = false;
+            return;
+        }
+        transform.Rotate(new Vector3(0f, zRotation * rotateYMultiplier, 0f));
 
-        // Daha smooth bir geçiş sağlamak için Lerp kullanıyoruz
-        Vector3 targetVelocity = new Vector3(targetVelocityX, rb.velocity.y, rb.velocity.z);
-        rb.velocity = Vector3.Lerp(rb.velocity, targetVelocity, Time.deltaTime * smoothness);
 
+        if (Math.Abs(rotationAmount) > maxRotation)
+            return;
+        zRotation += rotationAmount;
+        Quaternion rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, -zRotation);
+
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * rotationSensitivity);
+
+        if (Mathf.Abs(zRotation + rotationAmount) > Mathf.Abs(maxRotation))
+            return;
+    }
+    private void MoveBird()
+    {
+        float gravityScale = shape == Shape.Winged ? wingedGravityScale : ballGravityScale;
+        rb.velocity = Vector3.Lerp(rb.velocity, new Vector3(moveSpeed * transform.forward.x + (zRotation * 0.5f), globalGravity * gravityScale, moveSpeed * transform.right.x), Time.deltaTime * velocitySensitivity);
     }
 
     void LateUpdate()
     {
-        float gravityScale = shape == Shape.Ball ? ballGravityScale : wingedGravityScale;
-        Vector3 gravity = globalGravity * gravityScale * Vector3.up;
-        rb.AddForce(gravity, ForceMode.Impulse);
-
-        float speedMultiplier = rb.velocity.magnitude / 100f;
-        if (GameManager.Instance.GetState() != GameManager.State.GameOver && speedMultiplier < 1f)
-            speedMultiplier = 1f;
-        ballAnimationManager.SetBallRotateSpeedMultiplier(speedMultiplier);
-
         if (isStickTracked)
         {
             // Eğer topu daha fırlatmadıysak top çubuğun üst konumunu takip eder.
             transform.position = Vector3.Lerp(transform.position, StickTopTransform.position, Time.deltaTime * delayTimer);
         }
-    }
+        else
+        {
+            if (shape == Shape.Ball)
+            {
+                Vector3 gravity = globalGravity * ballGravityScale * Vector3.up;
+                rb.AddForce(gravity, ForceMode.Acceleration);
+            }
 
+
+            float speedMultiplier = rb.velocity.magnitude / 100f;
+            if (GameManager.Instance.GetState() != GameManager.State.GameOver && speedMultiplier < 1f)
+                speedMultiplier = 1f;
+            ballAnimationManager.SetBallRotateSpeedMultiplier(speedMultiplier);
+        }
+    }
+    public Shape GetCurrentShape()
+    {
+        return shape;
+    }
+    public void ChangeShape(Shape _shape)
+    {
+        if (shape == _shape) return;
+        if (_shape == Shape.Ball)
+        {
+            ballAnimationManager.Play(BallAnimationManager.AnimationState.CloseWings);
+            shape = Shape.Ball;
+        }
+    }
 }

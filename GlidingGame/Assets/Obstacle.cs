@@ -10,6 +10,7 @@ public class Obstacle : MonoBehaviour
     {
         if (collision.transform.TryGetComponent(out Rigidbody rb))
         {
+            BallController.Instance.ChangeShape(BallController.Shape.Ball);
             // Çarpýþmanýn gerçekleþtiði noktayý ve çarpýþmanýn yüzey normalini al
             ContactPoint contactPoint = collision.contacts[0];
             Vector3 contactNormal = contactPoint.normal;
@@ -19,10 +20,7 @@ public class Obstacle : MonoBehaviour
             Vector3 oppositeForce = -contactNormal * forceMagnitude * bouncyAmount;
 
             rb.AddForce(oppositeForce, ForceMode.Impulse);
-
-            // Kuþa ileri yönde sürekli bir kuvvet uygula
-            Vector3 forwardForce = transform.forward * forceMagnitude;
-            rb.AddForce(forwardForce, ForceMode.Force);
+  
         }
     }
 }

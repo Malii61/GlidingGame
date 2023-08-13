@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class StickController : MonoBehaviour
 {
@@ -28,9 +30,32 @@ public class StickController : MonoBehaviour
     private void Update()
     {
         if (isBallThrowed) { return; }
-
+#if !UNITY_EDITOR
+        if (EventSystem.current.currentSelectedGameObject != null) { return; }
+        if (Input.GetMouseButtonDown(0))
+        {
+            touchStartedPos = Input.mousePosition;
+            lastTouchPos = touchStartedPos;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            touchEndedPos = Input.mousePosition;
+            stickPosValue += CalculateMoveDirection(lastTouchPos, touchEndedPos);
+            stickPosValue = ClampValue(stickPosValue, 0f, 1f);
+            stickAnimationManager.PlayAt(stickPosValue);
+            lastTouchPos = touchEndedPos;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            stickAnimationManager.ReleaseStick();
+            BallController.Instance.ThrowBall(stickPosValue);
+            stickPosValue = 0;
+        }
+#else
         if (Input.touchCount > 0)
         {
+            if(EventSystem.current.currentSelectedGameObject != null) { return; }
+
             Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
             {
@@ -52,7 +77,9 @@ public class StickController : MonoBehaviour
                 stickPosValue = 0;
             }
         }
+#endif
     }
+
     private float CalculateMoveDirection(Vector2 start, Vector2 end)
     {
         float distance = Mathf.Abs(end.x - start.x);
@@ -70,3 +97,4 @@ public class StickController : MonoBehaviour
         return Mathf.Clamp(value, min, max);
     }
 }
+

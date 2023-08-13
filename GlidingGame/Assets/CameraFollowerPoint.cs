@@ -1,46 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraFollowerPoint : MonoBehaviour
 {
-    private Quaternion firstRotation;
-    private bool isPositionLocked;
-    private Vector3 lockedPosition;
-    private Vector3 startPosition;
-    // Start is called before the first frame update
-    void Start()
-    {
-        startPosition = transform.position;
-        firstRotation = transform.rotation;
-        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
-    }
+    [SerializeField] private Transform ballTransform;
 
-    private void GameManager_OnStateChanged(object sender, GameManager.State e)
+    private void Update()
     {
-        switch (e)
-        {
-            case GameManager.State.Ready:
-                transform.position = startPosition;
-                isPositionLocked = false; break;
-            case GameManager.State.GameOver: 
-                lockedPosition = transform.position;
-                isPositionLocked = true;
-                break;
-        }
+        transform.position = ballTransform.position;
     }
     private void LateUpdate()
     {
-        transform.rotation = firstRotation;
-
+        Quaternion rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, ballTransform.rotation.eulerAngles.y, 0f);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 3f);
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        if (isPositionLocked)
-        {
-            transform.position = lockedPosition;
-        }
-    }
+
 }

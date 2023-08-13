@@ -14,7 +14,7 @@ public class Ground : MonoBehaviour
     {
         switch(e)
         {
-            case GameManager.State.Ready:
+            case GameManager.State.Playing:
                 isCheckable = true; break;
             case GameManager.State.GameOver:
                 isCheckable = false; break;

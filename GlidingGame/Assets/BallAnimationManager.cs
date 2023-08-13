@@ -5,11 +5,13 @@ public class BallAnimationManager : MonoBehaviour
 {
     public enum AnimationState
     {
+        Idle,
         RotateBall,
         OpenWings,
         CloseWings,
     }
     [SerializeField] private float speedChangerValue = .8f;
+    private const string IDLE = "Idle";
     private const string ROTATE_BALL = "RotateBall";
     private const string OPEN_WINGS = "Armature|1_Open_wings_2";
     private const string CLOSE_WINGS = "Armature|2_Close_wings";
@@ -19,7 +21,17 @@ public class BallAnimationManager : MonoBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
+        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
     }
+
+    private void GameManager_OnStateChanged(object sender, GameManager.State e)
+    {
+        if (e == GameManager.State.Ready)
+        {
+            Play(AnimationState.Idle);
+        }
+    }
+
     public void Play(AnimationState state)
     {
         switch (state)
@@ -30,6 +42,7 @@ public class BallAnimationManager : MonoBehaviour
             case AnimationState.OpenWings:
                 if (animator.speed <= 0)
                 {
+                    transform.localRotation = Quaternion.identity;
                     animator.speed = 1;
                     animator.Play(OPEN_WINGS);
                 }
@@ -40,6 +53,10 @@ public class BallAnimationManager : MonoBehaviour
                 break;
             case AnimationState.CloseWings:
                 animator.Play(CLOSE_WINGS);
+                break;
+
+            case AnimationState.Idle:
+                animator.Play(IDLE);
                 break;
         }
     }

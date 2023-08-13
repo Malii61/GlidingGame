@@ -6,41 +6,25 @@ public class ObstacleSpawner : MonoBehaviour
 {
     [SerializeField] private float xLimit = 200f;
     [SerializeField] private float zLimit = 1500f;
-    [SerializeField] private Transform cylinderPrefab;
-    [SerializeField] private Transform cubePrefab;
-    public float checkRadius = 20f; // Kontrol edilecek menzil yarıçapı
+    [SerializeField] private List<Transform> obstaclePrefabs = new List<Transform>();
+    public float checkRadius = 38f; // Kontrol edilecek menzil yarıçapı
     private void Start()
     {
-        SpawnObstacle(100, cylinderPrefab);
-        SpawnObstacle(500, cubePrefab);
-        SpawnObstacle(100, cylinderPrefab);
-        SpawnObstacle(500, cubePrefab);
-        SpawnObstacle(100, cylinderPrefab);
-        SpawnObstacle(500, cubePrefab);
-        SpawnObstacle(100, cylinderPrefab);
-        SpawnObstacle(500, cubePrefab);
-        SpawnObstacle(100, cylinderPrefab);
-        SpawnObstacle(500, cubePrefab);
-        SpawnObstacle(100, cylinderPrefab);
-        SpawnObstacle(500, cubePrefab);
-        SpawnObstacle(100, cylinderPrefab);
-        SpawnObstacle(500, cubePrefab);
+        SpawnObstacles();
     }
-    private void SpawnObstacle(int obstacleCount, Transform prefab)
+    private void SpawnObstacles()
     {
         bool breakLoop = false;
-        for (int i = 0; i < obstacleCount; i++)
+        while (!breakLoop)
         {
-            if (breakLoop)
-                break;
+            Transform prefab = GetRandomObstacle();
 
-            Vector3 randomPos = Vector3.zero;
             bool isSpawnable = false;
             int isSpawnableCheckCounter = 0;
             while (!isSpawnable)
             {
                 isSpawnableCheckCounter++;
-                randomPos = GetRandomPoint();
+                Vector3 randomPos = GetRandomPoint();
                 isSpawnable = IsSpawnable(randomPos);
                 if (isSpawnable)
                 {
@@ -49,12 +33,19 @@ public class ObstacleSpawner : MonoBehaviour
                 if (isSpawnableCheckCounter > 100)
                 {
                     breakLoop = true;
+                    Debug.Log("kırıldı");
                     break;
                 }
             }
         }
 
     }
+
+    private Transform GetRandomObstacle()
+    {
+        return obstaclePrefabs[Random.Range(0, obstaclePrefabs.Count)];
+    }
+
     private bool IsSpawnable(Vector3 pos)
     {
         // Transform'un d�nya koordinatlar�ndaki pozisyonunu al�yoruz
@@ -66,7 +57,7 @@ public class ObstacleSpawner : MonoBehaviour
         // Kontrol edilen collider'lar� i�leme
         foreach (Collider collider in colliders)
         {
-            if ( collider.transform.TryGetComponent(out Obstacle obstacle))
+            if (collider.transform.TryGetComponent(out Obstacle obstacle))
             {
                 return false;
             }
