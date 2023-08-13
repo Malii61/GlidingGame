@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
-    [SerializeField] private float bouncyAmount; // Amount of bounce to apply on collision
+    [SerializeField] private float bouncyAmount; 
 
     private void OnCollisionEnter(Collision collision)
     {

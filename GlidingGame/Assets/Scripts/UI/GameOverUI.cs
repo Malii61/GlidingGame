@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class GameOverUI : MonoBehaviour
 {
-    [SerializeField] private Button tryAgainBtn; // Reference to the "Try Again" button
+    [SerializeField] private Button tryAgainBtn; 
 
     private void Awake()
     {

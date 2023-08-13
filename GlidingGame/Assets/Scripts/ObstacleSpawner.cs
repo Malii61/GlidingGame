@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class ObstacleSpawner : MonoBehaviour
 {
-    [SerializeField] private float xLimit = 200f; // Limit of the x-axis for obstacle spawning
-    [SerializeField] private float zLimit = 1500f; // Limit of the z-axis for obstacle spawning
-    [SerializeField] private List<Transform> obstaclePrefabs = new List<Transform>(); // List of obstacle prefabs
-    public float checkRadius = 38f; // Radius to check for spawnable area
+    [SerializeField] private float xLimit = 200f; 
+    [SerializeField] private float zLimit = 1500f; 
+    [SerializeField] private List<Transform> obstaclePrefabs = new List<Transform>();
+    public float checkRadius = 38f; 
 
     private void Start()
     {

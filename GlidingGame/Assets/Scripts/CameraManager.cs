@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    [SerializeField] private CinemachineVirtualCamera startCam; // Reference to the start camera
-    [SerializeField] private CinemachineVirtualCamera followBallCam; // Reference to the follow ball camera
-    private int higherPriority = 11; // Higher priority value for setting camera priority
-    private int lowerPriority = 9; // Lower priority value for setting camera priority
+    [SerializeField] private CinemachineVirtualCamera startCam; 
+    [SerializeField] private CinemachineVirtualCamera followBallCam; 
+    private int higherPriority = 11; 
+    private int lowerPriority = 9; 
 
     // Start is called before the first frame update
     void Start()

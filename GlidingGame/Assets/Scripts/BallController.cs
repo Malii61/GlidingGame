@@ -12,34 +12,34 @@ public class BallController : MonoBehaviour
 
     public static BallController Instance { get; private set; }
 
-    [SerializeField] private BallAnimationManager ballAnimationManager; // Reference to BallAnimationManager
-    [SerializeField] private Transform StickTopTransform; // Reference to the stick's top transform
-    [SerializeField] private float followStickDelayTimer = 30f; // Delay timer for following the stick
-    private bool isStickTracked = true; // Flag to track the stick's top position
-    private Shape shape = Shape.Ball; // Current shape of the ball (Ball or Winged)
+    [SerializeField] private BallAnimationManager ballAnimationManager; 
+    [SerializeField] private Transform StickTopTransform; 
+    [SerializeField] private float followStickDelayTimer = 30f; 
+    private bool isStickTracked = true;
+    private Shape shape = Shape.Ball; 
 
     // Rigidbody
-    [SerializeField] private Vector3 netForce; // Net force applied to the ball
-    [SerializeField] private float bendingForceMultiplier; // Multiplier for bending force
-    private Rigidbody rb; // Reference to the Rigidbody component
+    [SerializeField] private Vector3 netForce; 
+    [SerializeField] private float bendingForceMultiplier; 
+    private Rigidbody rb; 
 
     // Gravity
-    [SerializeField] private float ballGravityScale; // Gravity scale for the ball shape
-    [SerializeField] private float wingedGravityScale; // Gravity scale for the winged shape
-    private float globalGravity = -9.81f; // Global gravity value
+    [SerializeField] private float ballGravityScale; 
+    [SerializeField] private float wingedGravityScale; 
+    private float globalGravity = -9.81f; 
 
     // Rotate and movement
-    [SerializeField] private float rotationSensitivity = 2f; // Sensitivity for rotation
-    [SerializeField] private float velocitySensitivity = 2f; // Sensitivity for velocity
-    [SerializeField] private float rotateYMultiplier; // Multiplier for Y rotation
-    public float maxRotation = 50.0f; // Maximum rotation angle
-    public float moveSpeed = 5.0f; // Movement speed
-    public float rotationSpeedDivider = 10.0f; // Divide by screen width for rotation speed adjustment
-    private Vector2 touchStartPos; // Initial touch position
-    private float zRotation; // Current Z rotation
-    private float previousTouchDelta; // Previous touch delta for rotation calculation
-    private bool isFirstMove; // Flag to track the first move
-    private Vector3 firstPos; // Initial position of the ball
+    [SerializeField] private float rotationSensitivity = 2f; 
+    [SerializeField] private float velocitySensitivity = 2f; 
+    [SerializeField] private float rotateYMultiplier; 
+    public float maxRotation = 50.0f; 
+    public float moveSpeed = 5.0f; 
+    public float rotationSpeedDivider = 10.0f; 
+    private Vector2 touchStartPos; 
+    private float zRotation; 
+    private float previousTouchDelta; 
+    private bool isFirstMove;
+    private Vector3 firstPos; 
 
     private void Awake()
     {

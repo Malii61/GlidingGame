@@ -3,13 +3,13 @@ using UnityEngine.EventSystems;
 
 public class StickController : MonoBehaviour
 {
-    [SerializeField] private StickAnimationManager stickAnimationManager; // Reference to the StickAnimationManager
-    [SerializeField] private float touchSensitivity = 10f; // Sensitivity for touch movement
-    private Vector2 touchStartedPos; // Starting position of touch
-    private Vector2 touchEndedPos; // Ending position of touch
-    private Vector2 lastTouchPos; // Last recorded touch position
-    private float stickPosValue = 0f; // Current stick position value (0 to 1)
-    private bool isBallThrowed = false; // Flag to track if the ball is thrown
+    [SerializeField] private StickAnimationManager stickAnimationManager;
+    [SerializeField] private float touchSensitivity = 10f; 
+    private Vector2 touchStartedPos; 
+    private Vector2 touchEndedPos; 
+    private Vector2 lastTouchPos; 
+    private float stickPosValue = 0f; 
+    private bool isBallThrowed = false; 
 
     private void Start()
     {

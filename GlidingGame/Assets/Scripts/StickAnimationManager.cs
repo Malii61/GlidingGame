@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class StickAnimationManager : MonoBehaviour
 {
-    private const string BEND_STICK = "Armature|Bend_Stick"; // Animation state for bending the stick
-    private const string RELEASE_STICK = "Armature|Release_Stick"; // Animation state for releasing the stick
-    private Animator animator; // Reference to the Animator component
-    private float playFrameTimer; // Timer to control the frame to play
+    private const string BEND_STICK = "Armature|Bend_Stick"; 
+    private const string RELEASE_STICK = "Armature|Release_Stick"; 
+    private Animator animator; 
+    private float playFrameTimer; 
 
     private void Awake()
     {
