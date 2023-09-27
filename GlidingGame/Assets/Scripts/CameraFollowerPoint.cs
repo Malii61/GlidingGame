@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class CameraFollowerPoint : MonoBehaviour
 {
-    [SerializeField] private Transform ballTransform; // Reference to the ball's transform
-    private Vector3 lockedPosition; // The position where the camera is locked when game over
-    private Quaternion lockedRotation; // The rotation where the camera is locked when game over
-    private bool isGameOver; // Flag to track if the game is over
+    [SerializeField] private Transform ballTransform; 
+    private Vector3 lockedPosition;
+    private Quaternion lockedRotation; 
+    private bool isGameOver;
 
     private void Update()
     {

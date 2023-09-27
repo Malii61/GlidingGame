@@ -50,7 +50,6 @@ public class StickController : MonoBehaviour
             stickPosValue += CalculateMoveDirection(lastTouchPos, touchEndedPos);
             stickPosValue = ClampValue(stickPosValue, 0f, 1f);
             stickAnimationManager.PlayAt(stickPosValue);
-            lastTouchPos = touchEndedPos;
         }
         else if (Input.GetMouseButtonUp(0))
         {
@@ -97,7 +96,8 @@ public class StickController : MonoBehaviour
         }
         else
         {
-            return Mathf.Sign(end.x - start.x) > 0 ? -0.1f : 0.1f; // Move to the right (+1) or left (-1)
+            lastTouchPos = touchEndedPos;
+            return Mathf.Sign(end.x - start.x) > 0 ? -0.1f : 0.1f; // Move to the right or left
         }
     }
 

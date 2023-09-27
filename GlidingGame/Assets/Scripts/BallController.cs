@@ -12,34 +12,34 @@ public class BallController : MonoBehaviour
 
     public static BallController Instance { get; private set; }
 
-    [SerializeField] private BallAnimationManager ballAnimationManager; 
-    [SerializeField] private Transform StickTopTransform; 
-    [SerializeField] private float followStickDelayTimer = 30f; 
+    [SerializeField] private BallAnimationManager ballAnimationManager;
+    [SerializeField] private Transform StickTopTransform;
+    [SerializeField] private float followStickDelayTimer = 30f;
     private bool isStickTracked = true;
-    private Shape shape = Shape.Ball; 
+    private Shape shape = Shape.Ball;
 
     // Rigidbody
-    [SerializeField] private Vector3 netForce; 
-    [SerializeField] private float bendingForceMultiplier; 
-    private Rigidbody rb; 
+    [SerializeField] private Vector3 netForce;
+    [SerializeField] private float bendingForceMultiplier;
+    private Rigidbody rb;
 
     // Gravity
-    [SerializeField] private float ballGravityScale; 
-    [SerializeField] private float wingedGravityScale; 
-    private float globalGravity = -9.81f; 
+    [SerializeField] private float ballGravityScale;
+    [SerializeField] private float wingedGravityScale;
+    private float globalGravity = -9.81f;
 
     // Rotate and movement
-    [SerializeField] private float rotationSensitivity = 2f; 
-    [SerializeField] private float velocitySensitivity = 2f; 
-    [SerializeField] private float rotateYMultiplier; 
-    public float maxRotation = 50.0f; 
-    public float moveSpeed = 5.0f; 
-    public float rotationSpeedDivider = 10.0f; 
-    private Vector2 touchStartPos; 
-    private float zRotation; 
-    private float previousTouchDelta; 
+    [SerializeField] private float rotationSensitivity = 2f;
+    [SerializeField] private float velocitySensitivity = 2f;
+    [SerializeField] private float rotateYMultiplier;
+    public float maxRotation = 50.0f;
+    public float moveSpeed = 5.0f;
+    public float rotationSpeedDivider = 10.0f;
+    private Vector2 touchStartPos;
+    private float zRotation;
+    private float previousTouchDelta;
     private bool isFirstMove;
-    private Vector3 firstPos; 
+    private Vector3 firstPos;
 
     private void Awake()
     {
@@ -88,6 +88,7 @@ public class BallController : MonoBehaviour
     private void Update()
     {
         if (GameManager.Instance.GetState() != GameManager.State.Playing) { return; }
+
 #if UNITY_EDITOR
         if (Input.GetMouseButtonDown(0))
         {
@@ -165,16 +166,15 @@ public class BallController : MonoBehaviour
             return;
         }
 
-        // Calculate rotation amount and update Z rotation
-        if (Math.Abs(rotationAmount) > maxRotation)
+        if (Mathf.Abs(zRotation + rotationAmount) > Mathf.Abs(maxRotation))
             return;
+
+        // Update Z rotation
         zRotation += rotationAmount;
         Quaternion rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y + (zRotation * rotateYMultiplier), -zRotation);
         // Rotate bird
         rb.MoveRotation(Quaternion.Lerp(rb.rotation, rotation, Time.deltaTime * rotationSensitivity));
 
-        if (Mathf.Abs(zRotation + rotationAmount) > Mathf.Abs(maxRotation))
-            return;
     }
 
     private void MoveBird()
@@ -183,7 +183,9 @@ public class BallController : MonoBehaviour
         float yVelocity = shape == Shape.Winged ? globalGravity * wingedGravityScale : rb.velocity.y;
 
         // Change velocity by rotation
-        rb.velocity = Vector3.Lerp(rb.velocity, new Vector3(moveSpeed * transform.forward.x + (zRotation * 0.5f), yVelocity, moveSpeed * transform.right.x), Time.deltaTime * velocitySensitivity);
+        rb.velocity = Vector3.Lerp(rb.velocity, 
+            new Vector3(moveSpeed * transform.forward.x + (zRotation * 0.5f), yVelocity, moveSpeed * transform.right.x),
+            Time.deltaTime * velocitySensitivity);
     }
 
     void LateUpdate()
@@ -222,7 +224,7 @@ public class BallController : MonoBehaviour
         if (_shape == Shape.Ball)
         {
             ballAnimationManager.Play(BallAnimationManager.AnimationState.CloseWings);
-            shape = Shape.Ball;
         }
+        shape = _shape;
     }
 }

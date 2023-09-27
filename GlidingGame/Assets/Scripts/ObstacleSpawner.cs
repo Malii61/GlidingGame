@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class ObstacleSpawner : MonoBehaviour
@@ -35,7 +34,6 @@ public class ObstacleSpawner : MonoBehaviour
                 if (isSpawnableCheckCounter > 100)
                 {
                     breakLoop = true;
-                    Debug.Log("Broken");
                     break;
                 }
             }
@@ -69,7 +67,7 @@ public class ObstacleSpawner : MonoBehaviour
     private Vector3 GetRandomPoint()
     {
         // Generate a random position within the specified limits
-        Vector3 randomPos = new Vector3(Random.Range(-xLimit, xLimit), Random.Range(-2f, 6f), Random.Range(3, zLimit));
+        Vector3 randomPos = new Vector3(Random.Range(-xLimit, xLimit), Random.Range(-1f, 6f), Random.Range(3, zLimit));
         return randomPos;
     }
 }

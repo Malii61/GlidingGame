@@ -930,7 +930,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 1502844630}
   m_Lens:
-    FieldOfView: 72.76
+    FieldOfView: 72
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1000
@@ -1539,7 +1539,7 @@ MonoBehaviour:
   rotationSensitivity: 5
   velocitySensitivity: 2
   rotateYMultiplier: 0.05
-  maxRotation: 28
+  maxRotation: 50
   moveSpeed: 35
   rotationSpeedDivider: 75
 --- !u!4 &1003021115
